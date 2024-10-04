@@ -1,11 +1,19 @@
 import React, { forwardRef, useState, useImperativeHandle } from "react";
-import { Button, View, Text } from "react-native";
+import { Button, View, Text, Alert } from "react-native";
 import { Audio } from "expo-av";
-import { getMicrophonePermission } from "../utils/permissions";
 
 const Recorder = forwardRef((props, ref) => {
   const [recording, setRecording] = useState(null);
   const [recordedURI, setRecordedURI] = useState(null);
+
+  const getMicrophonePermission = async () => {
+    const { status } = await Audio.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission to access microphone is required!');
+      return false;
+    }
+    return true;
+  };
 
   const startRecording = async () => {
     // Check for microphone permission before recording
@@ -55,6 +63,7 @@ const Recorder = forwardRef((props, ref) => {
       <Button
         title={recording ? "Stop Recording" : "Start Recording"}
         onPress={recording ? stopRecording : startRecording}
+        style={{ alignItems: "center", marginTop: 20 }}
       />
       <Button title="Play Recording" onPress={playRecording} disabled={!recordedURI} />
     </View>
